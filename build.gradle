@@ -1,0 +1,83 @@
+plugins {
+	id 'java'
+	id 'org.springframework.boot' version '3.2.2'
+	id 'io.spring.dependency-management' version '1.1.4'
+	id 'io.gatling.gradle' version '3.9.5.1'
+}
+
+group = 'com.hernancussi.poc'
+version = '0.0.1-SNAPSHOT'
+
+java {
+	sourceCompatibility = '21'
+}
+
+ext {
+	dotEnvVersion = '4.0.0'
+	jedisVersion = '5.1.0'
+	ehCacheVersion = '3.10.0'
+	cacheApiVersion = '1.1.0'
+	gatlingVersion = '3.10.3'
+	docApiVersion = '2.3.0'
+	jjwtVersion = '0.12.5'
+}
+
+configurations {
+	compileOnly {
+		extendsFrom annotationProcessor
+	}
+}
+
+repositories {
+	mavenCentral()
+}
+
+dependencies {
+	implementation 'org.springframework.boot:spring-boot-starter-actuator'
+	implementation 'org.springframework.boot:spring-boot-starter-security'
+	implementation 'org.springframework.boot:spring-boot-starter-web'
+	implementation 'org.springframework.boot:spring-boot-starter-aop'
+	implementation 'io.micrometer:micrometer-registry-prometheus'
+	implementation 'org.springframework.boot:spring-boot-starter-data-redis'
+	implementation "redis.clients:jedis:$jedisVersion"
+	implementation "org.ehcache:ehcache:$ehCacheVersion"
+	implementation "javax.cache:cache-api:$cacheApiVersion"
+	implementation "org.springdoc:springdoc-openapi-starter-webmvc-ui:$docApiVersion"
+	implementation "io.jsonwebtoken:jjwt-api:$jjwtVersion"
+	runtimeOnly "io.jsonwebtoken:jjwt-impl:$jjwtVersion"
+	runtimeOnly "io.jsonwebtoken:jjwt-jackson:$jjwtVersion"
+
+	implementation "me.paulschwarz:spring-dotenv:$dotEnvVersion"
+
+	compileOnly 'org.projectlombok:lombok'
+	annotationProcessor 'org.projectlombok:lombok'
+
+	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+	testImplementation 'org.springframework.security:spring-security-test'
+	testImplementation "io.gatling:gatling-core:$gatlingVersion"
+	testImplementation "io.gatling.highcharts:gatling-charts-highcharts:$gatlingVersion"
+}
+
+tasks.named('test') {
+	useJUnitPlatform()
+}
+
+tasks.withType(JavaCompile) {
+	configure(options) {
+		options.compilerArgs << '--enable-preview' << '-Xlint:preview'
+	}
+}
+
+tasks.withType(Test) {
+	jvmArgs += "--enable-preview"
+}
+
+tasks.withType(JavaExec) {
+	jvmArgs += '--enable-preview'
+}
+
+gatling {
+	simulations = {
+		include "**/simulations/*.java"
+	}
+}
