@@ -2,8 +2,6 @@ package com.hernancussi.poc.metrics.concurrency.cache;
 
 import lombok.Getter;
 import lombok.NonNull;
-import org.springframework.data.redis.connection.RedisPassword;
-import org.springframework.data.redis.connection.RedisStandaloneConfiguration;
 import org.springframework.data.redis.connection.jedis.JedisConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
@@ -17,13 +15,10 @@ public class RedisCacheService<V> implements ICacheService<V> {
   @Getter
   private final String namespace;
 
-  public RedisCacheService(String host, Integer port, String password, String namespace) {
-    var redisConfiguration = new RedisStandaloneConfiguration(host, port);
-    redisConfiguration.setPassword(RedisPassword.of(password));
-    var connectionFactory = new JedisConnectionFactory(redisConfiguration);
-    connectionFactory.afterPropertiesSet();
+  public RedisCacheService(JedisConnectionFactory redisConnectionFactory, String namespace) {
+
     redisTemplate = new RedisTemplate<>();
-    redisTemplate.setConnectionFactory(connectionFactory);
+    redisTemplate.setConnectionFactory(redisConnectionFactory);
     redisTemplate.setKeySerializer(new StringRedisSerializer());
     redisTemplate.afterPropertiesSet();
     this.namespace = namespace;

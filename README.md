@@ -3,7 +3,7 @@
 Clone the repository and setup JDK 21 locally, using `sdkman` is a good alternative.
 Rename the `.env.example` file to be `.env`.
 
-### Run Application
+### Run Application for development
 
 ```bash
 ./gradlew bootRun
@@ -104,10 +104,26 @@ Can be enabled by using different spring profiles.
 
 ### Docker Compose
 
+Run everything from dockerize environment.
+
+#### SpringBoot
+
+Building and register docker image
+
+```bash
+./gradlew bootBuildImage --imageName=hcussi/metrics-concurrency:0.0.1 --createdDate now
+```
+
+Testing it
+
+```bash
+docker run --name java-metrics-concurrency -p 8080:8080 --env-file .env --env JAVA_OPTS="--enable-preview" hcussi/metrics-concurrency:0.0.1 env
+```
+
 In order to use Redis, collect metrics with Prometheus and use Grafana dashboard execute the following command:
 
 ```bash
-docker-compose -f docker-compose-concurrency.yml up -d 
+docker-compose -f docker-compose-concurrency.yml up -d
 ```
 
 ### Concurrency
@@ -132,10 +148,12 @@ Spring actuator is used in order to use different metrics and collect them in Pr
 
 Consume the REST endpoint `actuator/prometheus` in order to collect the different metrics for the different endpoints.
 It also uses the basic authentication to access the info.
+Visit [http://localhost:9090](http://localhost:9090), no login credentials are required.
 
 #### Grafana
 
 A default datasource and dashboard has been provided in order to check the different metrics collected by Prometheus.
+Visit [http://localhost:3000/login](http://localhost:3000/login) and login with default credentials `admin/admin`.
 
 ### Gatling
 

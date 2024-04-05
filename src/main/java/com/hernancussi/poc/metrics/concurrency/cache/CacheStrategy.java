@@ -5,6 +5,7 @@ import io.micrometer.core.instrument.Gauge;
 import io.micrometer.core.instrument.MeterRegistry;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.connection.jedis.JedisConnectionFactory;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
@@ -20,12 +21,15 @@ public class CacheStrategy<V> {
 
   private final MeterRegistry meterRegistry;
 
+  private final JedisConnectionFactory redisConnectionFactory;
+
   private final Map<String, CacheCounterEntry<V>> cacheMap = new HashMap<>();
 
   @Autowired
-  public CacheStrategy(ApplicationConfig applicationConfig, MeterRegistry meterRegistry) {
+  public CacheStrategy(ApplicationConfig applicationConfig, MeterRegistry meterRegistry, JedisConnectionFactory redisConnectionFactory) {
     this.applicationConfig = applicationConfig;
     this.meterRegistry = meterRegistry;
+    this.redisConnectionFactory = redisConnectionFactory;
   }
 
   /**
@@ -38,9 +42,7 @@ public class CacheStrategy<V> {
 
     switch (applicationConfig.getCacheStrategyType()) {
       case REDIS -> cacheService = Optional.of(new RedisCacheService<V>(
-        applicationConfig.getRedisHost(),
-        applicationConfig.getRedisPort(),
-        applicationConfig.getRedisPassword(),
+        redisConnectionFactory,
         name.orElse("default")
       ));
       case EHCACHE -> cacheService = Optional.of(new EhCacheService<>(name.orElse("default"), applicationConfig.getEhCacheSize()));
