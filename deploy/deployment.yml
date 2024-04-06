@@ -1,0 +1,77 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: concurrency-redis
+  labels:
+    app: concurrency-redis
+spec:
+  selector:
+    matchLabels:
+      app: concurrency-redis
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: concurrency-redis
+    spec:
+      containers:
+        - name: concurrency-redis
+          image: redis:7.2.4
+          imagePullPolicy: Never
+          envFrom:
+            - configMapRef:
+                name: concurrency-config
+          ports:
+            - protocol: TCP
+              containerPort: 6379
+          command: ["redis-server"]
+          args:
+            - --requirepass
+            - $(REDIS_HOST_PASSWORD)
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: concurrency-java
+  labels:
+    app: concurrency-java
+spec:
+  selector:
+    matchLabels:
+      app: concurrency-java
+  replicas: 2
+  template:
+    metadata:
+      labels:
+        app: concurrency-java
+    spec:
+      containers:
+        - name: concurrency-java
+          image: hcussi/metrics-concurrency:0.0.1
+          lifecycle:
+            preStop: # avoid requests being routed to a pod that has already begun shutting down.
+              exec:
+                command: [ "sh", "-c", "sleep 10" ]
+          imagePullPolicy: Never
+          ports:
+            - protocol: TCP
+              containerPort: 8080
+          envFrom:
+            - configMapRef:
+                name: concurrency-config
+          env:
+            - name: JAVA_OPTS
+              value: "--enable-preview"
+          livenessProbe:
+            httpGet:
+              path: /actuator/health/liveness
+              port: 8080
+            initialDelaySeconds: 15
+            periodSeconds: 10
+          readinessProbe:
+            httpGet:
+              path: /actuator/health/readiness
+              port: 8080
+            initialDelaySeconds: 15
+            periodSeconds: 10

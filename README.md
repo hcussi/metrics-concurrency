@@ -165,12 +165,63 @@ API local load testing has been defined to stress the different endpoints and to
 
 After running the gatling task the performance reports can be checked.
 
-### GraphQl
-
-
-### Native Images
-
-
 ### Kubernetes
 
+`Kind`, `K3s`, `Docker Desktop` among others to test this locally. 
+Be sure to stop docker containers created by `docker-compose`.
 
+#### ConfigMap
+
+Update `.env` first: 
+
+```bash
+REDIS_HOST=concurrency-redis-svc
+```
+
+Generate config map:
+```bash
+kubectl create configmap concurrency-config --from-env-file=.env
+```
+
+Check config map created:
+```bash
+kubectl describe configmaps concurrency-config
+```
+
+#### Pods & Load Balancers
+
+Create pods:
+
+```bash
+kubectl apply -f deploy/deployment.yml
+```
+
+Check state:
+
+```bash
+kubectl get pods
+```
+
+Create LB to expose services:
+
+```bash
+kubectl apply -f deploy/load-balancers.yml
+```
+
+```bash
+kubectl get services
+```
+
+```bash
+kubectl get deployments
+```
+
+Check for errors if it doesn't start correctly.
+
+```bash
+ kubectl describe pods
+```
+
+```bash
+kubectl logs concurrency-java-[hash]
+```
