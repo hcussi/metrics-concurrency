@@ -81,7 +81,3 @@ gatling {
 		include "**/simulations/*.java"
 	}
 }
-
-tasks.named("bootBuildImage") {
-	tags = ["hcussi/metrics-concurrency:0.0.1"]
-}

@@ -71,6 +71,10 @@ In order to use redis, the container needs to be created, refer to `Docker Compo
   * Prometheus
   * Grafana
   * Redis
+* Kubernetes
+  * AWS ECR
+  * AWS EKS
+  * AWS EC2
 
 ### Java 21 and preview features
 
@@ -108,17 +112,20 @@ Run everything from dockerize environment.
 
 #### SpringBoot
 
-Building and register docker image
+Building and register YOUR own docker image or use the public one located at https://hub.docker.com/r/hernancussi/metrics-concurrency 
+If you want to build your own:
 
 ```bash
-./gradlew bootBuildImage --imageName=hcussi/metrics-concurrency:0.0.1 --createdDate now
+./gradlew bootBuildImage --imageName=[YOUR_ACCOUNT]/metrics-concurrency:0.0.1 --createdDate now
 ```
 
 Testing it
 
 ```bash
-docker run --name java-metrics-concurrency -p 8080:8080 --env-file .env --env JAVA_OPTS="--enable-preview" hcussi/metrics-concurrency:0.0.1 env
+docker run --name java-metrics-concurrency -p 8080:8080 --env-file .env --env JAVA_OPTS="--enable-preview" [YOUR_ACCOUNT]/metrics-concurrency:0.0.1 env
 ```
+
+#### Local environment
 
 In order to use Redis, collect metrics with Prometheus and use Grafana dashboard execute the following command:
 
@@ -126,7 +133,7 @@ In order to use Redis, collect metrics with Prometheus and use Grafana dashboard
 docker-compose -f docker-compose-concurrency.yml up -d
 ```
 
-### Concurrency
+### Concurrency strategies
 
 There are two concurrency strategies that can be used to calculate mathematical operations, `?strategy=VIRTUAL` and `?strategy=THREADS`.
 
@@ -199,7 +206,7 @@ kubectl apply -f deploy/deployment.yml
 Check state:
 
 ```bash
-kubectl get pods
+kubectl get pods --watch
 ```
 
 Create LB to expose services:
@@ -225,3 +232,118 @@ Check for errors if it doesn't start correctly.
 ```bash
 kubectl logs concurrency-java-[hash]
 ```
+
+### AWS
+
+Install and configure AWS CLI
+
+More info:
+- https://support.count.ly/hc/en-us/articles/4413310032793-Docker-and-Kubernetes-Cluster-Deployment-with-Amazon-Elastic-Kubernetes-Service-EKS
+
+#### Amazon Container Elastic Registry
+
+In the AWS Console create a container for the image `metrics-concurrency`, tag it and upload if following the steps provided by AWS guide.
+
+#### Amazon IAM
+
+Create VPC
+
+```bash
+aws cloudformation create-stack \
+  --region [REGION] \
+  --stack-name metrics-concurrency-eks-vpc-stack \
+  --template-url https://s3.us-west-2.amazonaws.com/amazon-eks/cloudformation/2020-10-29/amazon-eks-vpc-private-subnets.yaml
+```
+
+Create IAM role
+
+```bash
+aws iam create-role \
+  --role-name eksClusterRole \
+  --assume-role-policy-document file://"deploy/aws/eks/cluster-trust-policy.json"
+```
+
+```bash
+aws iam create-role \
+  --role-name eKSNodeRole \
+  --assume-role-policy-document file://"deploy/aws/eks/node-role-trust-policy.json"
+```
+
+```bash
+aws iam attach-role-policy \
+  --policy-arn arn:aws:iam::aws:policy/AmazonEKSClusterPolicy \
+  --role-name eksClusterRole
+```
+
+```bash
+aws iam attach-role-policy \
+  --policy-arn arn:aws:iam::aws:policy/AmazonEKSWorkerNodePolicy \
+  --role-name eKSNodeRole
+aws iam attach-role-policy \
+  --policy-arn arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryReadOnly \
+  --role-name eKSNodeRole
+aws iam attach-role-policy \
+  --policy-arn arn:aws:iam::aws:policy/AmazonEKS_CNI_Policy \
+  --role-name eKSNodeRole
+```
+
+More info
+- https://docs.aws.amazon.com/eks/latest/userguide/service_IAM_role.html#create-service-role
+
+#### Amazon EKS
+
+Named cluster `metrics-concurrency` and select IAM role created, VPC created, Security Group and make it private.
+
+Configure this cluster to be used locally with `kubectl` by adding new context:
+
+```bash
+aws eks update-kubeconfig --region [REGION] --name metrics-concurrency
+```
+
+```bash
+ kubectl config get-contexts
+```
+
+The namespace used by default will be `arn:aws:eks:[REGION]:[ACCOUNT_ID]:cluster/metrics-concurrency`.
+
+Testing it
+```bash
+kubectl get svc
+```
+
+In AWS console add node group `metrics-concurrency-nodegroup` under Compute section, select IAM role created.
+Using `t2.small` will prevent (this is for the limited IP addresses in the node):
+
+```bash
+kubectl describe pods
+...
+Events:
+  Type     Reason            Age                  From               Message
+  ----     ------            ----                 ----               -------
+  Warning  FailedScheduling  12s (x2 over 5m20s)  default-scheduler  0/2 nodes are available: 2 Too many pods. preemption: 0/2 nodes are available: 2 No preemption victims found for incoming pod.
+```
+
+More info
+- https://docs.aws.amazon.com/eks/latest/userguide/getting-started-console.html
+
+Rename the `deploy/aws/eks/.env.example` file to be `deploy/aws/eks/.env` and generate config map:
+```bash
+kubectl create configmap concurrency-config --from-env-file=deploy/aws/eks/.env
+```
+
+Create pods:
+```bash
+kubectl apply -f deploy/aws/eks/deployment.yml
+```
+
+```bash
+kubectl get pods --watch
+```
+
+Navigate to all API endpoints using `EXTERNAL-IP` from
+
+```bash
+kubectl get svc
+```
+
+Navigate to [Health endpoint](http://AWS_ACCOUNT_ID.us-east-2.elb.amazonaws.com/actuator/health) 
