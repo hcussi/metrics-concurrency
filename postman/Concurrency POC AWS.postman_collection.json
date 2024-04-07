@@ -1,0 +1,541 @@
+{
+	"info": {
+		"_postman_id": "8ad29950-7b73-42fc-b85d-22b726790775",
+		"name": "Concurrency POC AWS",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "32896554"
+	},
+	"item": [
+		{
+			"name": "actuator",
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": [
+						{
+							"key": "password",
+							"value": "{{USER_PASS}}",
+							"type": "string"
+						},
+						{
+							"key": "username",
+							"value": "admin",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://{{ELB}}.us-east-2.elb.amazonaws.com/actuator",
+					"protocol": "http",
+					"host": [
+						"{{ELB}}",
+						"us-east-2",
+						"elb",
+						"amazonaws",
+						"com"
+					],
+					"path": [
+						"actuator"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "actuator-health",
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": [
+						{
+							"key": "password",
+							"value": "{{USER_PASS}}",
+							"type": "string"
+						},
+						{
+							"key": "username",
+							"value": "admin",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://{{ELB}}.us-east-2.elb.amazonaws.com/actuator/health",
+					"protocol": "http",
+					"host": [
+						"{{ELB}}",
+						"us-east-2",
+						"elb",
+						"amazonaws",
+						"com"
+					],
+					"path": [
+						"actuator",
+						"health"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "actuator-metrics",
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": [
+						{
+							"key": "password",
+							"value": "{{USER_PASS}}",
+							"type": "string"
+						},
+						{
+							"key": "username",
+							"value": "admin",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://{{ELB}}.us-east-2.elb.amazonaws.com/actuator/metrics",
+					"protocol": "http",
+					"host": [
+						"{{ELB}}",
+						"us-east-2",
+						"elb",
+						"amazonaws",
+						"com"
+					],
+					"path": [
+						"actuator",
+						"metrics"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "prometheus",
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": [
+						{
+							"key": "password",
+							"value": "{{USER_PASS}}",
+							"type": "string"
+						},
+						{
+							"key": "username",
+							"value": "admin",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://{{ELB}}.us-east-2.elb.amazonaws.com/actuator/prometheus",
+					"protocol": "http",
+					"host": [
+						"{{ELB}}",
+						"us-east-2",
+						"elb",
+						"amazonaws",
+						"com"
+					],
+					"path": [
+						"actuator",
+						"prometheus"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "calculateFactorial",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{JWT_TOKEN}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"numbers\": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25,\n    26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50,\n    51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 70]\n}\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://{{ELB}}.us-east-2.elb.amazonaws.com/api/v1/calculateFactorial",
+					"protocol": "http",
+					"host": [
+						"{{ELB}}",
+						"us-east-2",
+						"elb",
+						"amazonaws",
+						"com"
+					],
+					"path": [
+						"api",
+						"v1",
+						"calculateFactorial"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "calculateFactorialThreads",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{JWT_TOKEN}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"numbers\": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25,\n    26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50,\n    51, 52, 53, 54, 55, 56, 57, 58, 59, 60]\n}\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://{{ELB}}.us-east-2.elb.amazonaws.com/api/v1/calculateFactorial?strategy=THREADS",
+					"protocol": "http",
+					"host": [
+						"{{ELB}}",
+						"us-east-2",
+						"elb",
+						"amazonaws",
+						"com"
+					],
+					"path": [
+						"api",
+						"v1",
+						"calculateFactorial"
+					],
+					"query": [
+						{
+							"key": "strategy",
+							"value": "THREADS"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "calculateFactorialVirtual",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{JWT_TOKEN}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"numbers\": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25,\n    26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50,\n    51, 52, 53, 54, 55, 56, 57, 58, 59, 60]\n}\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://{{ELB}}.us-east-2.elb.amazonaws.com/api/v1/calculateFactorial?strategy=VIRTUAL",
+					"protocol": "http",
+					"host": [
+						"{{ELB}}",
+						"us-east-2",
+						"elb",
+						"amazonaws",
+						"com"
+					],
+					"path": [
+						"api",
+						"v1",
+						"calculateFactorial"
+					],
+					"query": [
+						{
+							"key": "strategy",
+							"value": "VIRTUAL"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "calculateSquare",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{JWT_TOKEN}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"numbers\": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25,\n    26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50,\n    51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61]\n}\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://{{ELB}}.us-east-2.elb.amazonaws.com/api/v1/calculateSquare",
+					"protocol": "http",
+					"host": [
+						"{{ELB}}",
+						"us-east-2",
+						"elb",
+						"amazonaws",
+						"com"
+					],
+					"path": [
+						"api",
+						"v1",
+						"calculateSquare"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "calculateSquareThreads",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{JWT_TOKEN}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"numbers\": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25,\n    26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50,\n    51, 52, 53, 54, 55, 56, 57, 58, 59, 60]\n}\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://{{ELB}}.us-east-2.elb.amazonaws.com/api/v1/calculateSquare?strategy=THREADS",
+					"protocol": "http",
+					"host": [
+						"{{ELB}}",
+						"us-east-2",
+						"elb",
+						"amazonaws",
+						"com"
+					],
+					"path": [
+						"api",
+						"v1",
+						"calculateSquare"
+					],
+					"query": [
+						{
+							"key": "strategy",
+							"value": "THREADS"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "calculateSquareVirtual",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{JWT_TOKEN}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"numbers\": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25,\n    26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50,\n    51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61,62]\n}\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://{{ELB}}.us-east-2.elb.amazonaws.com/api/v1/calculateSquare?strategy=VIRTUAL",
+					"protocol": "http",
+					"host": [
+						"{{ELB}}",
+						"us-east-2",
+						"elb",
+						"amazonaws",
+						"com"
+					],
+					"path": [
+						"api",
+						"v1",
+						"calculateSquare"
+					],
+					"query": [
+						{
+							"key": "strategy",
+							"value": "VIRTUAL"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "cacheClear",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{JWT_TOKEN}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"url": {
+					"raw": "http://{{ELB}}.us-east-2.elb.amazonaws.com/api/v1/cache/clear",
+					"protocol": "http",
+					"host": [
+						"{{ELB}}",
+						"us-east-2",
+						"elb",
+						"amazonaws",
+						"com"
+					],
+					"path": [
+						"api",
+						"v1",
+						"cache",
+						"clear"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "authentication",
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"username\": \"{{API_USER_NAME}}\",\n    \"password\": \"{{API_USER_PASS}}\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://{{ELB}}.us-east-2.elb.amazonaws.com/api/v1/authentication",
+					"protocol": "http",
+					"host": [
+						"{{ELB}}",
+						"us-east-2",
+						"elb",
+						"amazonaws",
+						"com"
+					],
+					"path": [
+						"api",
+						"v1",
+						"authentication"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "generateSecret",
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://{{ELB}}.us-east-2.elb.amazonaws.com/api/v1/generateSecret",
+					"protocol": "http",
+					"host": [
+						"{{ELB}}",
+						"us-east-2",
+						"elb",
+						"amazonaws",
+						"com"
+					],
+					"path": [
+						"api",
+						"v1",
+						"generateSecret"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}

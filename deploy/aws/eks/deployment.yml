@@ -17,7 +17,7 @@ spec:
     spec:
       containers:
         - name: concurrency-java
-          image: 533267160846.dkr.ecr.us-east-2.amazonaws.com/metrics-concurrency:latest
+          image: 533267160846.dkr.ecr.us-east-2.amazonaws.com/metrics-concurrency:0.0.3
           lifecycle:
             preStop: # avoid requests being routed to a pod that has already begun shutting down.
               exec:

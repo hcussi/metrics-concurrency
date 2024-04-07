@@ -75,6 +75,7 @@ In order to use redis, the container needs to be created, refer to `Docker Compo
   * AWS ECR
   * AWS EKS
   * AWS EC2
+  * AWS ElastiCache
 
 ### Java 21 and preview features
 
@@ -116,13 +117,22 @@ Building and register YOUR own docker image or use the public one located at htt
 If you want to build your own:
 
 ```bash
-./gradlew bootBuildImage --imageName=[YOUR_ACCOUNT]/metrics-concurrency:0.0.1 --createdDate now
+./gradlew bootBuildImage --imageName=metrics-concurrency-java:0.0.3 --createdDate now
+```
+
+Get the image ID of the recent image created:
+
+```bash
+docker tag [IMAGE_ID] [DOCKER_HUB_ACCOUNT]/metrics-concurrency:latest
+docker tag [IMAGE_ID] [DOCKER_HUB_ACCOUNT]/metrics-concurrency:0.0.3
+docker push hernancussi/metrics-concurrency:latest
+docker push hernancussi/metrics-concurrency:0.0.3
 ```
 
 Testing it
 
 ```bash
-docker run --name java-metrics-concurrency -p 8080:8080 --env-file .env --env JAVA_OPTS="--enable-preview" [YOUR_ACCOUNT]/metrics-concurrency:0.0.1 env
+docker run --name java-metrics-concurrency -p 8080:8080 --env-file .env --env JAVA_OPTS="--enable-preview" [YOUR_ACCOUNT]/metrics-concurrency:0.0.3 env
 ```
 
 #### Local environment
@@ -244,6 +254,16 @@ More info:
 
 In the AWS Console create a container for the image `metrics-concurrency`, tag it and upload if following the steps provided by AWS guide.
 
+Get the image ID of the recent image created:
+
+```bash
+aws ecr get-login-password --region [REGION] docker login --username AWS --password-stdin [AWS_ACCOUNT_ID].dkr.ecr.[REGION].amazonaws.com
+docker tag [IMAGE_ID] [AWS_ACCOUNT_ID].dkr.ecr.[REGION].amazonaws.com/metrics-concurrency:latest
+docker tag [IMAGE_ID] [AWS_ACCOUNT_ID].dkr.ecr.[REGION].amazonaws.com/metrics-concurrency:0.0.3
+docker push [AWS_ACCOUNT_ID].dkr.ecr.[REGION].amazonaws.com/metrics-concurrency:latest
+docker push [AWS_ACCOUNT_ID].dkr.ecr.[REGION].amazonaws.com/metrics-concurrency:0.0.3
+```
+
 #### Amazon IAM
 
 Create VPC
@@ -290,6 +310,10 @@ aws iam attach-role-policy \
 More info
 - https://docs.aws.amazon.com/eks/latest/userguide/service_IAM_role.html#create-service-role
 
+#### AWS ElastiCache
+
+Configure new Redis cluster using the security group and VPC from EKS. Copy the primary endpoint that will be used as `REDIS_HOST`.
+
 #### Amazon EKS
 
 Named cluster `metrics-concurrency` and select IAM role created, VPC created, Security Group and make it private.
@@ -322,6 +346,8 @@ Events:
   ----     ------            ----                 ----               -------
   Warning  FailedScheduling  12s (x2 over 5m20s)  default-scheduler  0/2 nodes are available: 2 Too many pods. preemption: 0/2 nodes are available: 2 No preemption victims found for incoming pod.
 ```
+
+Adding node groups will add EC2 instances, Application Load Balancer and Autoscaling group.
 
 More info
 - https://docs.aws.amazon.com/eks/latest/userguide/getting-started-console.html

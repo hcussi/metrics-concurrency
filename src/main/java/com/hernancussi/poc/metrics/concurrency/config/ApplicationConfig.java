@@ -28,6 +28,9 @@ public class ApplicationConfig {
   @Value("${redis-password:}")
   private String redisPassword;
 
+  @Value("${redis-username:}")
+  private String redisUsername;
+
   @Value("${ehcache-size:20}")
   private Integer ehCacheSize;
 
