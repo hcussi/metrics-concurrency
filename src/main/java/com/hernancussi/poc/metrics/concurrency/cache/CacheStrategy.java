@@ -3,6 +3,7 @@ package com.hernancussi.poc.metrics.concurrency.cache;
 import com.hernancussi.poc.metrics.concurrency.config.ApplicationConfig;
 import io.micrometer.core.instrument.Gauge;
 import io.micrometer.core.instrument.MeterRegistry;
+import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.connection.jedis.JedisConnectionFactory;
@@ -21,15 +22,15 @@ public class CacheStrategy<V> {
 
   private final MeterRegistry meterRegistry;
 
-  private final JedisConnectionFactory redisConnectionFactory;
+  @Setter @Autowired(required = false)
+  private JedisConnectionFactory redisConnectionFactory;
 
   private final Map<String, CacheCounterEntry<V>> cacheMap = new HashMap<>();
 
   @Autowired
-  public CacheStrategy(ApplicationConfig applicationConfig, MeterRegistry meterRegistry, JedisConnectionFactory redisConnectionFactory) {
+  public CacheStrategy(ApplicationConfig applicationConfig, MeterRegistry meterRegistry) {
     this.applicationConfig = applicationConfig;
     this.meterRegistry = meterRegistry;
-    this.redisConnectionFactory = redisConnectionFactory;
   }
 
   /**
